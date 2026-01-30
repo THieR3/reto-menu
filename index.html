@@ -3,97 +3,180 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu Restaurant - Focus</title>
+    <title>Menu 3D - Catégories & Focus</title>
     <style>
         :root { --orange: #e67e22; --cream: #fdf5e6; }
-        body { background: var(--cream); font-family: sans-serif; margin: 0; overflow-x: hidden; }
+        body { background: var(--cream); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; color: #333; }
         
-        h1 { text-align: center; margin-top: 30px; color: #5d3412; }
+        h1 { text-align: center; margin-top: 20px; font-size: 24px; color: #5d3412; }
 
-        /* Conteneur de défilement horizontal */
+        /* --- Barre de Catégories --- */
+        .nav-categories {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(253, 245, 230, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        .cat-btn {
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            background: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: 0.3s;
+            font-size: 14px;
+        }
+
+        .cat-btn.active {
+            background: var(--orange);
+            color: white;
+        }
+
+        /* --- Slider Horizontal --- */
         .menu-slider {
             display: flex;
             overflow-x: auto;
             scroll-snap-type: x mandatory;
-            padding: 50px 0;
-            gap: 15px;
+            padding: 60px 0; /* Espace pour l'agrandissement */
+            gap: 25px;
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
         .menu-slider::-webkit-scrollbar { display: none; }
 
-        /* Style des cartes réduites */
+        /* --- Cartes des Plats --- */
         .card {
-            min-width: 200px; /* Largeur réduite */
-            width: 200px;
-            height: 300px;
+            min-width: 180px; /* Largeur réduite */
+            width: 180px;
+            height: 260px;
             background: white;
             border-radius: 25px;
             scroll-snap-align: center;
-            transition: transform 0.4s ease, opacity 0.4s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
             color: black;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            opacity: 0.5; 
+            transform: scale(0.85);
             display: flex;
             flex-direction: column;
-            opacity: 0.6; /* Les cartes sur les côtés sont plus sombres */
-            transform: scale(0.8); /* Les cartes sur les côtés sont plus petites */
+            overflow: hidden;
         }
 
-        /* Quand la carte est au centre (géré par JS) */
+        /* Focus : Plat au centre */
         .card.is-active {
             opacity: 1;
-            transform: scale(1.1); /* Plus grande au centre */
-            z-index: 2;
+            transform: scale(1.15); /* Plus grand au centre */
+            box-shadow: 0 15px 30px rgba(230, 126, 34, 0.3);
+            z-index: 10;
         }
 
-        .card-img { height: 180px; background: #eee; border-radius: 25px 25px 0 0; }
-        .card-info { padding: 15px; text-align: center; }
+        .card-img {
+            height: 150px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #ccc;
+        }
 
-        /* Espaces vides pour permettre le centrage du premier et dernier élément */
-        .spacer { min-width: calc(50vw - 115px); }
+        .card-info {
+            padding: 15px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-info strong { font-size: 16px; display: block; margin-bottom: 5px; }
+        .price { color: var(--orange); font-weight: bold; }
+
+        /* Espaces pour centrer le premier/dernier plat */
+        .spacer { min-width: calc(50vw - 90px); }
     </style>
 </head>
 <body>
-    <h1>Notre Menu</h1>
+
+    <h1>Notre Menu 3D</h1>
+
+    <div class="nav-categories">
+        <button class="cat-btn active" onclick="changeCategory('Entrée', this)">Entrées</button>
+        <button class="cat-btn" onclick="changeCategory('Plat', this)">Plats</button>
+        <button class="cat-btn" onclick="changeCategory('Jus', this)">Jus</button>
+    </div>
+
     <div class="menu-slider" id="slider">
-        <div class="spacer"></div>
         </div>
 
     <script>
-        async function loadMenu() {
-            const resp = await fetch('menu.json');
-            const data = await resp.json();
+        let menuData = [];
+
+        async function init() {
+            try {
+                const response = await fetch('menu.json');
+                menuData = await response.json();
+                // Charger la catégorie par défaut
+                changeCategory('Entrée', document.querySelector('.cat-btn.active'));
+            } catch (e) { console.error("Erreur JSON:", e); }
+        }
+
+        function changeCategory(cat, btn) {
+            // Mise à jour des boutons
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
             const slider = document.getElementById('slider');
+            const filtered = menuData.filter(item => item.categorie === cat);
+
+            // Génération des cartes
+            slider.innerHTML = `<div class="spacer"></div>` + 
+                filtered.map(item => `
+                    <a href="detail-plat.html?id=${item.id}" class="card">
+                        <div class="card-img">3D</div>
+                        <div class="card-info">
+                            <strong>${item.nom}</strong>
+                            <span class="price">${item.prix}</span>
+                        </div>
+                    </a>
+                `).join('') + 
+                `<div class="spacer"></div>`;
+
+            // Réinitialiser la position du scroll au début
+            slider.scrollLeft = 0;
+            // Forcer le calcul du focus immédiatement
+            updateFocus();
+        }
+
+        function updateFocus() {
+            const slider = document.getElementById('slider');
+            const cards = document.querySelectorAll('.card');
+            const center = slider.scrollLeft + (slider.offsetWidth / 2);
             
-            const cardsHTML = data.map(item => `
-                <a href="detail-plat.html?id=${item.id}" class="card">
-                    <div class="card-img"></div>
-                    <div class="card-info">
-                        <strong>${item.nom}</strong><br>
-                        <span style="color:var(--orange)">${item.prix}</span>
-                    </div>
-                </a>
-            `).join('');
-            
-            slider.innerHTML = `<div class="spacer"></div>` + cardsHTML + `<div class="spacer"></div>`;
-            
-            // Gestion du focus au défilement
-            slider.addEventListener('scroll', () => {
-                const cards = document.querySelectorAll('.card');
-                const center = slider.scrollLeft + (slider.offsetWidth / 2);
-                
-                cards.forEach(card => {
-                    const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
-                    if (Math.abs(center - cardCenter) < 100) {
-                        card.classList.add('is-active');
-                    } else {
-                        card.classList.remove('is-active');
-                    }
-                });
+            cards.forEach(card => {
+                const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
+                // Si la carte est proche du centre de l'écran
+                if (Math.abs(center - cardCenter) < 100) {
+                    card.classList.add('is-active');
+                } else {
+                    card.classList.remove('is-active');
+                }
             });
         }
-        loadMenu();
+
+        // Ecouter le défilement
+        document.getElementById('slider').addEventListener('scroll', updateFocus);
+
+        init();
     </script>
 </body>
 </html>
