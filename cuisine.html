@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Interface Cuisine</title>
+    <style>
+        body { font-family: sans-serif; background: #2c3e50; color: white; padding: 20px; }
+        .order-card { background: #ecf0f1; color: #333; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 10px solid #e67e22; }
+        .table-num { font-size: 24px; font-weight: bold; color: #e67e22; }
+        .notes { background: #f9ebda; padding: 10px; border-radius: 5px; font-style: italic; margin-top: 10px; }
+        .btn-done { background: #27ae60; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>👨‍🍳 Commandes en cours</h1>
+    <div id="commandes-liste"></div>
+
+    <script>
+        function afficherCommandes() {
+            const commandes = JSON.parse(localStorage.getItem('commandesCuisine')) || [];
+            const container = document.getElementById('commandes-liste');
+            container.innerHTML = "";
+
+            commandes.forEach((c, index) => {
+                container.innerHTML += `
+                    <div class="order-card">
+                        <div style="display:flex; justify-content:space-between">
+                            <span class="table-num">Table ${c.table}</span>
+                            <span>Heure: ${c.heure}</span>
+                        </div>
+                        <hr>
+                        <ul>${c.plats.map(p => `<li>${p.nom}</li>`).join('')}</ul>
+                        <div class="notes">Note: ${c.notes || "Aucune"}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px">
+                            <strong>Total: ${c.total}€</strong>
+                            <button class="btn-done" onclick="terminer(${index})">PRÊT ✔️</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function terminer(index) {
+            let commandes = JSON.parse(localStorage.getItem('commandesCuisine'));
+            commandes.splice(index, 1);
+            localStorage.setItem('commandesCuisine', JSON.stringify(commandes));
+            afficherCommandes();
+        }
+
+        // Rafraîchir toutes les 5 secondes
+        setInterval(afficherCommandes, 5000);
+        afficherCommandes();
+    </script>
+</body>
+</html>

@@ -88,9 +88,9 @@
         <div id="avis-section" style="max-height: 80px; overflow-y: auto; font-size: 13px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px;">
             </div>
 
-        <button style="width:100%; padding:18px; background:#e67e22; color:white; border:none; border-radius:20px; font-weight:bold; margin-top:20px; font-size:16px;">
-            COMMANDER MAINTENANT
-        </button>
+        <button onclick="ajouterAuPanier()" style="width:100%; padding:18px; background:#e67e22; color:white; border:none; border-radius:20px; font-weight:bold; margin-top:20px;">
+         AJOUTER AU PANIER
+         </button>
     </div>
 
     <script>
@@ -119,6 +119,21 @@
                     `).join('');
                 }
             });
+        function ajouterAuPanier() {
+             const plat = {
+             id: new URLSearchParams(window.location.search).get('id'),
+             nom: document.getElementById('nom').innerText,
+             prix: document.getElementById('prix').innerText,
+              table: new URLSearchParams(window.location.search).get('table') || "0" 
+     };
+    
+       let panier = JSON.parse(localStorage.getItem('panier')) || [];
+       panier.push(plat);
+       localStorage.setItem('panier', JSON.stringify(panier));
+    
+       alert("Plat ajouté au panier !");
+        window.location.href = 'panier.html';
+    }
     </script>
 </body>
 </html>
