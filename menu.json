@@ -8,6 +8,17 @@
     "modele3D": "assets/models/1.glb",
     "desc": "Une salade fraîche avec thon, olives et œufs.",
     "avis": [{"u": "Marc", "n": 5, "t": "Produits très frais !"}, {"u": "Sophie", "n": 4, "t": "Belle présentation."}]
+    
+  },
+  {
+     "id": "e2",
+    "categorie": "Entrée",
+    "nom": "Salade Niçoise",
+    "prix": "12€",
+    "image": "assets/images/1.jpg",
+    "modele3D": "assets/models/1.glb",
+    "desc": "Une salade fraîche avec thon, olives et œufs.",
+    "avis": [{"u": "Marc", "n": 5, "t": "Produits très frais !"}, {"u": "Sophie", "n": 4, "t": "Belle présentation."}]
   },
   {
     "id": "p1",
