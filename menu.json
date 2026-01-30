@@ -4,26 +4,29 @@
     "categorie": "Entrée",
     "nom": "Salade Niçoise",
     "prix": "12€",
-    "modele3D": "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
-    "desc": "Thon, olives, et légumes frais.",
-    "avis": [{"u": "Marc", "n": 5, "t": "Très frais !"}, {"u": "Luc", "n": 4, "t": "Copieux."}]
+    "image": "assets/images/salade.jpg",
+    "modele3D": "assets/models/salade.glb",
+    "desc": "Une salade fraîche avec thon, olives et œufs.",
+    "avis": [{"u": "Marc", "n": 5, "t": "Produits très frais !"}, {"u": "Sophie", "n": 4, "t": "Belle présentation."}]
   },
   {
     "id": "p1",
     "categorie": "Plat",
     "nom": "Steak Grillé",
     "prix": "24€",
-    "modele3D": "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
-    "desc": "Boeuf fondant, cuisson au choix.",
-    "avis": [{"u": "Julie", "n": 5, "t": "La 3D est bluffante !"}]
+    "image": "assets/images/steak.jpg",
+    "modele3D": "assets/models/steak.glb",
+    "desc": "Bœuf fondant grillé au feu de bois.",
+    "avis": [{"u": "Jean", "n": 5, "t": "Cuisson parfaite."}]
   },
   {
     "id": "j1",
     "categorie": "Jus",
     "nom": "Jus d'Orange",
     "prix": "5€",
-    "modele3D": "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
-    "desc": "Pressé minute, 100% frais.",
-    "avis": [{"u": "Samy", "n": 5, "t": "Excellent."}]
+    "image": "assets/images/orange.jpg",
+    "modele3D": "assets/models/orange.glb",
+    "desc": "Orange pressée à la demande.",
+    "avis": [{"u": "Léa", "n": 5, "t": "Vrai jus frais."}]
   }
-]
+]   

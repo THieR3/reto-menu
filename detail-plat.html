@@ -3,105 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualisation Live</title>
+    <title>Détail Plat 3D</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        body, html { margin: 0; height: 100%; font-family: sans-serif; background: #000; }
+        body { margin: 0; font-family: sans-serif; background: #000; color: white; }
+        
+        /* 3D Viewer Full Screen pour simuler la caméra */
+        model-viewer { width: 100%; height: 100vh; background: #222; }
 
-        /* Le viewer prend tout l'écran pour simuler la caméra */
-        model-viewer {
-            width: 100%;
-            height: 100vh;
-            --poster-color: transparent;
+        /* Panneau de contrôle iOS Transparent */
+        .glass-panel {
+            position: fixed; bottom: 20px; left: 15px; right: 15px;
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px); border-radius: 35px;
+            padding: 25px; color: #1a1a1a; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            z-index: 100; border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* Panneau iOS Transparent en bas */
-        .ios-panel {
-            position: fixed;
-            bottom: 20px;
-            left: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-radius: 30px;
-            padding: 25px;
-            z-index: 100;
-            color: #1a1a1a;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
+        .ar-btn {
+            position: absolute; top: -70px; right: 20px;
+            background: white; border: none; padding: 12px 25px;
+            border-radius: 20px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .ar-trigger {
-            background: white;
-            color: black;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px auto;
-            cursor: pointer;
+        .back-btn {
+            position: fixed; top: 20px; left: 20px; z-index: 1000;
+            background: rgba(255,255,255,0.8); border: none; width: 45px; height: 45px;
+            border-radius: 50%; font-size: 20px; cursor: pointer;
         }
 
-        .review-box {
-            max-height: 150px;
-            overflow-y: auto;
-            margin-top: 15px;
-            font-size: 14px;
-            border-top: 1px solid rgba(0,0,0,0.1);
-            padding-top: 10px;
-        }
+        .reviews { margin-top: 15px; max-height: 120px; overflow-y: auto; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
     </style>
 </head>
 <body>
+    <button class="back-btn" onclick="history.back()">←</button>
 
-    <model-viewer id="v" 
-        ar 
-        ar-modes="webxr scene-viewer quick-look" 
-        camera-controls 
-        auto-rotate 
-        shadow-intensity="2"
-        environment-image="neutral"
-        alt="Plat 3D">
-        
-        <button slot="ar-button" class="ar-trigger">
-            📸 VOIR SUR MA TABLE (LIVE)
-        </button>
+    <model-viewer id="v" ar ar-modes="webxr scene-viewer quick-look" camera-controls auto-rotate shadow-intensity="1">
+        <button slot="ar-button" class="ar-btn">📸 VOIR SUR MA TABLE</button>
     </model-viewer>
 
-    <div class="ios-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center">
-            <h2 id="nom" style="margin:0">...</h2>
-            <span id="prix" style="font-weight:bold; color: #e67e22; font-size: 20px;">--€</span>
+    <div class="glass-panel">
+        <div style="display:flex; justify-content:space-between">
+            <h2 id="nom" style="margin:0">Plat</h2>
+            <span id="prix" style="color:#e67e22; font-weight:bold; font-size:20px">--€</span>
         </div>
-        <p id="desc" style="opacity:0.8; margin: 10px 0;">...</p>
+        <p id="desc" style="font-size:14px; margin:10px 0; opacity:0.8"></p>
 
-        <div class="review-box" id="avis-list">
-            </div>
-        
-        <button style="width:100%; padding:15px; background:#e67e22; color:white; border:none; border-radius:15px; font-weight:bold; margin-top:15px;">
-            AJOUTER AU PANIER
-        </button>
+        <div class="reviews" id="avis"></div>
+
+        <button style="width:100%; padding:15px; background:#e67e22; color:white; border:none; border-radius:15px; font-weight:bold; margin-top:15px;">AJOUTER AU PANIER</button>
     </div>
 
     <script>
         const id = new URLSearchParams(window.location.search).get('id');
         fetch('menu.json').then(r => r.json()).then(data => {
-            const p = data.find(item => item.id === id);
+            const p = data.find(i => i.id === id);
             if(p) {
                 document.getElementById('nom').innerText = p.nom;
                 document.getElementById('prix').innerText = p.prix;
                 document.getElementById('desc').innerText = p.desc;
                 document.getElementById('v').src = p.modele3D;
-                document.getElementById('avis-list').innerHTML = p.avis.map(a => `
-                    <div style="margin-bottom:10px">
-                        <strong>${a.u}</strong> <span style="color:#f1c40f">★${a.n}</span>
-                        <p style="margin:2px 0; opacity:0.7">${a.t}</p>
-                    </div>
-                `).join('');
+                document.getElementById('avis').innerHTML = `<strong>Avis :</strong>` + p.avis.map(a => `<div style="margin-top:5px"><b>${a.u}</b> : ${a.t}</div>`).join('');
             }
         });
     </script>
