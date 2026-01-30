@@ -3,70 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détail Plat 3D</title>
+    <title>Visualisation AR & 3D</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    
     <style>
-        body { margin: 0; font-family: sans-serif; background: #000; color: white; }
-        
-        /* 3D Viewer Full Screen pour simuler la caméra */
-        model-viewer { width: 100%; height: 100vh; background: #222; }
+        body, html { margin: 0; height: 100%; background: #111; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
 
-        /* Panneau de contrôle iOS Transparent */
+        /* Le viewer occupe tout l'écran */
+        model-viewer {
+            width: 100%;
+            height: 100vh;
+            background-color: #222;
+            --poster-color: transparent;
+        }
+
+        /* Bouton pour lancer l'AR (Caméra Live) */
+        .ar-button {
+            background-color: white;
+            border-radius: 30px;
+            border: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 999;
+            cursor: pointer;
+        }
+
+        /* Panneau iOS Transparent */
         .glass-panel {
-            position: fixed; bottom: 20px; left: 15px; right: 15px;
-            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px); border-radius: 35px;
-            padding: 25px; color: #1a1a1a; box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-            z-index: 100; border: 1px solid rgba(255,255,255,0.2);
+            position: fixed;
+            bottom: 25px;
+            left: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 35px;
+            padding: 25px;
+            color: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
         }
 
-        .ar-btn {
-            position: absolute; top: -70px; right: 20px;
-            background: white; border: none; padding: 12px 25px;
-            border-radius: 20px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        .back-btn {
-            position: fixed; top: 20px; left: 20px; z-index: 1000;
-            background: rgba(255,255,255,0.8); border: none; width: 45px; height: 45px;
-            border-radius: 50%; font-size: 20px; cursor: pointer;
-        }
-
-        .reviews { margin-top: 15px; max-height: 120px; overflow-y: auto; font-size: 14px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px; }
+        .price-tag { color: #e67e22; font-size: 24px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <button class="back-btn" onclick="history.back()">←</button>
 
-    <model-viewer id="v" ar ar-modes="webxr scene-viewer quick-look" camera-controls auto-rotate shadow-intensity="1">
-        <button slot="ar-button" class="ar-btn">📸 VOIR SUR MA TABLE</button>
+    <button class="back-btn" onclick="history.back()" style="position:fixed; top:20px; left:20px; z-index:1000; border:none; background:white; width:45px; height:45px; border-radius:50%; font-weight:bold;">←</button>
+
+    <model-viewer id="v" 
+        ar 
+        ar-modes="webxr scene-viewer quick-look" 
+        ar-placement="floor"
+        camera-controls 
+        touch-action="pan-y"
+        auto-rotate 
+        shadow-intensity="2" 
+        exposure="1"
+        environment-image="neutral">
+        
+        <button slot="ar-button" class="ar-button">
+            👋 POSER SUR MA TABLE
+        </button>
+
+        <div id="ar-prompt">
+            <img src="https://modelviewer.dev/shared-assets/icons/hand.png" style="display:none;">
+        </div>
     </model-viewer>
 
     <div class="glass-panel">
-        <div style="display:flex; justify-content:space-between">
-            <h2 id="nom" style="margin:0">Plat</h2>
-            <span id="prix" style="color:#e67e22; font-weight:bold; font-size:20px">--€</span>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 id="nom" style="margin:0">Chargement...</h2>
+            <span class="price-tag" id="prix">--€</span>
         </div>
-        <p id="desc" style="font-size:14px; margin:10px 0; opacity:0.8"></p>
+        <p id="desc" style="margin: 15px 0; line-height: 1.4; opacity: 0.9;"></p>
+        
+        <div id="avis-section" style="max-height: 80px; overflow-y: auto; font-size: 13px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px;">
+            </div>
 
-        <div class="reviews" id="avis"></div>
-
-        <button style="width:100%; padding:15px; background:#e67e22; color:white; border:none; border-radius:15px; font-weight:bold; margin-top:15px;">AJOUTER AU PANIER</button>
+        <button style="width:100%; padding:18px; background:#e67e22; color:white; border:none; border-radius:20px; font-weight:bold; margin-top:20px; font-size:16px;">
+            COMMANDER MAINTENANT
+        </button>
     </div>
 
     <script>
-        const id = new URLSearchParams(window.location.search).get('id');
-        fetch('menu.json').then(r => r.json()).then(data => {
-            const p = data.find(i => i.id === id);
-            if(p) {
-                document.getElementById('nom').innerText = p.nom;
-                document.getElementById('prix').innerText = p.prix;
-                document.getElementById('desc').innerText = p.desc;
-                document.getElementById('v').src = p.modele3D;
-                document.getElementById('avis').innerHTML = `<strong>Avis :</strong>` + p.avis.map(a => `<div style="margin-top:5px"><b>${a.u}</b> : ${a.t}</div>`).join('');
-            }
-        });
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+
+        fetch('menu.json')
+            .then(response => response.json())
+            .then(data => {
+                const plat = data.find(p => p.id === id);
+                if(plat) {
+                    document.getElementById('nom').innerText = plat.nom;
+                    document.getElementById('prix').innerText = plat.prix;
+                    document.getElementById('desc').innerText = plat.desc;
+                    
+                    const viewer = document.getElementById('v');
+                    viewer.src = plat.modele3D;
+                    // Optionnel : ajouter un fichier .usdz pour une meilleure expérience sur iPhone
+                    // viewer.iosSrc = plat.modeleUSDZ; 
+
+                    const avisCont = document.getElementById('avis-section');
+                    avisCont.innerHTML = plat.avis.map(a => `
+                        <div style="margin-bottom:8px;">
+                            <strong>${a.u}</strong> : ${a.t}
+                        </div>
+                    `).join('');
+                }
+            });
     </script>
 </body>
 </html>
