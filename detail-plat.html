@@ -3,53 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détail du Plat</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
-        body { margin: 0; background: #fdf5e6; font-family: sans-serif; }
-        
-        /* Conteneur 3D : Arrière-plan */
-        model-viewer { width: 100%; height: 60vh; background: transparent; }
-
-        /* Div transparente style iOS */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.6);
+        body { margin: 0; font-family: sans-serif; background: #fdf5e6; overflow-x: hidden; }
+        model-viewer { width: 100%; height: 55vh; background: transparent; }
+        .glass-card { 
+            background: rgba(255, 255, 255, 0.6); 
             backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-radius: 40px 40px 0 0;
-            padding: 30px; position: relative; margin-top: -50px;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            border-radius: 40px 40px 0 0; padding: 30px; margin-top: -40px; 
+            min-height: 50vh; box-shadow: 0 -10px 30px rgba(0,0,0,0.1); 
+            position: relative; z-index: 10;
         }
-
-        .tag { background: #fef4d8; padding: 5px 15px; border-radius: 15px; font-size: 12px; margin-right: 5px; }
-        .review { background: rgba(255,255,255,0.3); padding: 15px; border-radius: 15px; margin-top: 10px; }
-        .order-btn { width: 100%; background: #e67e22; color: white; border: none; padding: 15px; border-radius: 15px; font-weight: bold; margin-top: 20px; }
+        .ar-btn { position: absolute; top: -60px; right: 20px; padding: 12px 20px; border-radius: 25px; border: none; background: white; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; }
+        .review { background: rgba(255,255,255,0.4); padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid rgba(255,255,255,0.2); }
+        .back-btn { position: absolute; top: 20px; left: 20px; z-index: 100; background: white; border: none; width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body>
+    <button class="back-btn" onclick="location.href='index.html'">←</button>
 
-    <model-viewer src="assets/models/steak.glb" ar camera-controls auto-rotate shadow-intensity="1">
-        <button slot="ar-button" style="position:absolute; bottom:60px; left:50%; transform:translateX(-50%); padding:10px; border-radius:20px; border:none; background:white;">📸 Voir sur ma table</button>
+    <model-viewer id="v" ar ar-modes="webxr scene-viewer quick-look" camera-controls auto-rotate shadow-intensity="1">
+        <button slot="ar-button" class="ar-btn">📸 Voir sur ma table</button>
     </model-viewer>
 
     <div class="glass-card">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h1>Steak Grillé</h1>
-            <span style="color:#e67e22; font-size:24px; font-weight:bold;">24€</span>
+            <h1 id="nom">Chargement...</h1>
+            <span id="prix" style="color:#e67e22; font-size:24px; font-weight:bold;">--€</span>
         </div>
+        <p id="desc">...</p>
         
-        <p>Description : Un steak fondant cuit au feu de bois.</p>
-        
-        <div>
-            <span class="tag">Boeuf</span><span class="tag">Grillé</span>
-        </div>
-
-        <h3>Avis clients</h3>
-        <div class="review">
-            <strong>Kévin R.</strong> ⭐⭐⭐⭐⭐
-            <p>Le rendu 3D est identique au plat servi ! Incroyable.</p>
-        </div>
-
-        <button class="order-btn">Commander ce plat</button>
+        <h3>Avis Clients</h3>
+        <div id="avis-list"></div>
     </div>
 
+    <script>
+        const id = new URLSearchParams(window.location.search).get('id');
+        fetch('menu.json').then(r => r.json()).then(data => {
+            const p = data.find(item => item.id === id);
+            if(p) {
+                document.getElementById('nom').innerText = p.nom;
+                document.getElementById('prix').innerText = p.prix;
+                document.getElementById('desc').innerText = p.desc;
+                document.getElementById('v').src = p.modele3D;
+                document.getElementById('avis-list').innerHTML = p.avis.map(a => `
+                    <div class="review">
+                        <strong>${a.u}</strong> ${"⭐".repeat(a.n)}
+                        <p style="margin:5px 0 0 0; font-size:14px;">${a.t}</p>
+                    </div>
+                `).join('');
+            }
+        });
+    </script>
 </body>
 </html>

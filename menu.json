@@ -1,0 +1,29 @@
+[
+  {
+    "id": "e1",
+    "categorie": "Entrée",
+    "nom": "Salade Niçoise",
+    "prix": "12€",
+    "modele3D": "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    "desc": "Thon, olives, et légumes frais.",
+    "avis": [{"u": "Marc", "n": 5, "t": "Très frais !"}, {"u": "Luc", "n": 4, "t": "Copieux."}]
+  },
+  {
+    "id": "p1",
+    "categorie": "Plat",
+    "nom": "Steak Grillé",
+    "prix": "24€",
+    "modele3D": "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    "desc": "Boeuf fondant, cuisson au choix.",
+    "avis": [{"u": "Julie", "n": 5, "t": "La 3D est bluffante !"}]
+  },
+  {
+    "id": "j1",
+    "categorie": "Jus",
+    "nom": "Jus d'Orange",
+    "prix": "5€",
+    "modele3D": "https://modelviewer.dev/shared-assets/models/Astronaut.glb",
+    "desc": "Pressé minute, 100% frais.",
+    "avis": [{"u": "Samy", "n": 5, "t": "Excellent."}]
+  }
+]

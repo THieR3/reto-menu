@@ -3,52 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu - Accueil</title>
+    <title>Menu Digital 3D</title>
     <style>
         :root { --orange: #e67e22; --cream: #fdf5e6; }
-        body { background-color: var(--cream); font-family: sans-serif; margin: 0; padding: 20px 0; text-align: center; }
-        
-        .nav-categories { 
-            display: flex; justify-content: space-around; 
-            background: rgba(255,255,255,0.5); backdrop-filter: blur(10px);
-            margin: 20px; padding: 15px; border-radius: 20px;
-        }
-        .cat-btn { border: none; padding: 10px 20px; border-radius: 12px; background: white; font-weight: bold; }
+        body { background: var(--cream); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; text-align: center; }
+        .nav { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .cat-btn { padding: 12px 20px; border-radius: 25px; border: none; background: white; cursor: pointer; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .cat-btn.active { background: var(--orange); color: white; }
-
-        .horizontal-scroll {
-            display: flex; overflow-x: auto; scroll-snap-type: x mandatory;
-            gap: 20px; padding: 20px; scrollbar-width: none;
-        }
-        .card { 
-            min-width: 85vw; background: white; border-radius: 30px; 
-            scroll-snap-align: center; overflow: hidden; text-align: left;
-            text-decoration: none; color: black; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-        .card img { width: 100%; height: 250px; object-fit: cover; }
-        .card-content { padding: 20px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 20px; overflow: hidden; text-decoration: none; color: black; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: block; }
+        .card-info { padding: 15px; text-align: left; }
+        .price { color: var(--orange); font-weight: bold; }
     </style>
 </head>
 <body>
     <h1>Notre Menu</h1>
-    <div class="nav-categories">
-        <button class="cat-btn active">Entrée</button>
-        <button class="cat-btn">Plat</button>
-        <button class="cat-btn">Dessert</button>
+    <div class="nav">
+        <button class="cat-btn active" onclick="filter('Entrée', this)">Entrées</button>
+        <button class="cat-btn" onclick="filter('Plat', this)">Plats</button>
+        <button class="cat-btn" onclick="filter('Jus', this)">Jus</button>
     </div>
+    <div class="menu-grid" id="container"></div>
 
-    <div class="horizontal-scroll">
-        <a href="detail-plat.html" class="card">
-            <img src="assets/images/steak_preview.jpg" alt="Steak">
-            <div class="card-content">
-                <div style="display:flex; justify-content:space-between">
-                    <h2>Steak Grillé</h2>
-                    <h2 style="color:var(--orange)">24€</h2>
-                </div>
-                <p>Découvrez la texture de notre viande en 3D.</p>
-            </div>
-        </a>
-    </div>
-    <p style="color:var(--orange)">← Faites défiler →</p>
+    <script>
+        let menuData = [];
+
+        async function init() {
+            try {
+                const response = await fetch('menu.json');
+                menuData = await response.json();
+                filter('Entrée', document.querySelector('.active'));
+            } catch (e) { console.error("Erreur chargement JSON:", e); }
+        }
+
+        function filter(cat, btn) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const html = menuData.filter(i => i.categorie === cat).map(item => `
+                <a href="detail-plat.html?id=${item.id}" class="card">
+                    <div style="height:150px; background:#ddd; display:flex; align-items:center; justify-content:center">Aperçu 3D</div>
+                    <div class="card-info">
+                        <div style="display:flex; justify-content:space-between">
+                            <strong>${item.nom}</strong>
+                            <span class="price">${item.prix}</span>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+            document.getElementById('container').innerHTML = html;
+        }
+        init();
+    </script>
 </body>
 </html>
